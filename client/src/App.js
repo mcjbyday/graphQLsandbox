@@ -4,12 +4,18 @@ import Home from './pages/Home';
 import Matchup from './pages/Matchup';
 import Vote from './pages/Vote';
 
+
+const client = new ApolloClient({
+  uri: '/graphql',
+  cache: new InMemoryCache(),
+});
+
 function App() {
   return (
     <Router>
       <div className="flex-column justify-center align-center min-100-vh bg-primary">
         <Routes>
-          <Route 
+          <Route  
             path="/" 
             element={<Home />} 
           />

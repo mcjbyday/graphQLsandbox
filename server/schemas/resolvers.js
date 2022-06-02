@@ -1,6 +1,5 @@
 
 const { Matchup, Tech } = require('../models');
-const { signToken } = require('../utils/auth');
 
 const resolvers = {
   Query: {
@@ -10,7 +9,7 @@ const resolvers = {
     },
     match: async (parent, args) => {
       // Use the parameter to find the matching match in the collection
-      return await Matchup.findById(args.id);
+      return await Matchup.findById(args._id);
     },
     allTech:  async () => {
       // Get and return all documents from the matches collection
@@ -22,10 +21,10 @@ const resolvers = {
           const matchup = await Matchup.create({tech1, tech2});
           return matchup;
         },
-    updateMatchupVote: async (parent, { id, whichTech }) => {
+    updateMatchupVote: async (parent, { _id, whichTech }) => {
       // Find and update the matching class using the destructured args
       return await Matchup.findOneAndUpdate(
-        { _id: id }, 
+        { _id: _id }, 
         { $inc: { [`tech${whichTech}_votes`]: 1 } },
         // Return the newly updated object instead of the original
         { new: true }

@@ -1,25 +1,35 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { getAllMatchups } from '../utils/api';
+import { useQuery } from '@apollo/client';
+import { QUERY_MATCHES } from '../utils/queries';
+
+// import { getAllMatchups } from '../utils/api';
 
 const Home = () => {
+  const { loading, data } = useQuery(QUERY_MATCHES);
+  
+  const matches = data?.matches || [];
+  
   const [matchupList, setMatchupList] = useState([]);
+  
+  setMatchupList(matches);
 
-  useEffect(() => {
-    const getMatchupList = async () => {
-      try {
-        const res = await getAllMatchups();
-        if (!res.ok) {
-          throw new Error('No list of matchups');
-        }
-        const matchupList = await res.json();
-        setMatchupList(matchupList);
-      } catch (err) {
-        console.error(err);
-      }
-    };
-    getMatchupList();
-  }, []);
+  
+  // useEffect(() => {
+  //   const getMatchupList = async () => {
+  //     try {
+  //       const res = await getAllMatchups();
+  //       if (!res.ok) {
+  //         throw new Error('No list of matchups');
+  //       }
+  //       const matchupList = await res.json();
+  //       setMatchupList(matchupList);
+  //     } catch (err) {
+  //       console.error(err);
+  //     }
+  //   };
+  //   getMatchupList();
+  // }, []);
 
   return (
     <div className="card bg-white card-rounded w-50">

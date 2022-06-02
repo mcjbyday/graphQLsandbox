@@ -1,30 +1,45 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState} from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getAllTech, createMatchup } from '../utils/api';
+// import { getAllTech, createMatchup } from '../utils/api';
+import { useQuery, useMutation } from '@apollo/client';
+import { QUERY_ALLTECH } from '../utils/queries';
+import { ADD_MATCHUP } from '../utils/mutations';
+
 
 const Matchup = () => {
-  const [techList, setTechList] = useState([]);
+  
+  const { loading, data } = useQuery(QUERY_ALLTECH);
+  
+  const techList = data?.allTech || [];
+
+  // const [techList, setTechList] = useState([]);
+
+
   const [formData, setFormData] = useState({
     tech1: 'JavaScript',
     tech2: 'JavaScript',
   });
+  
+  // allows us to programmatically switch URLs
   let navigate = useNavigate();
 
-  useEffect(() => {
-    const getTechList = async () => {
-      try {
-        const res = await getAllTech();
-        if (!res.ok) {
-          throw new Error('No list of technologies');
-        }
-        const techList = await res.json();
-        setTechList(techList);
-      } catch (err) {
-        console.error(err);
-      }
-    };
-    getTechList();
-  }, []);
+  const [createMatchup, {error} ] = useMutation(ADD_MATCHUP)
+
+  // useEffect(() => {
+  //   const getTechList = async () => {
+  //     try {
+  //       const res = await getAllTech();
+  //       if (!res.ok) {
+  //         throw new Error('No list of technologies');
+  //       }
+  //       const techList = await res.json();
+  //       setTechList(techList);
+  //     } catch (err) {
+  //       console.error(err);
+  //     }
+  //   };
+  //   getTechList();
+  // }, []);
 
   const handleInputChange = (event) => {
     const { name, value } = event.target;
@@ -35,15 +50,19 @@ const Matchup = () => {
     event.preventDefault();
 
     try {
-      const res = await createMatchup(formData);
+      // const res = await createMatchup({
+      const { data } = await createMatchup({
+        variables: { ...formData},
+      });
 
-      if (!res.ok) {
-        throw new Error('something went wrong!');
-      }
+      // if (!res.ok) {
+      //   throw new Error('something went wrong!');
+      // }
 
-      const matchup = await res.json();
-      console.log(matchup);
-      navigate(`/matchup/${matchup._id}`);
+      // const matchup = await res.json();
+      // console.log(matchup);
+      // navigate(`/matchup/${matchup._id}`);
+      navigate(`/matchup/${data.createMatchup._id}`);
     } catch (err) {
       console.error(err);
     }

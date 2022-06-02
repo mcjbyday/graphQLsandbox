@@ -1,38 +1,54 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { getMatchup, createVote } from '../utils/api';
+// import { getMatchup, createVote } from '../utils/api';
+import { UPDATE_MATCH } from '../utils/mutations';
+import { QUERY_MATCHES } from '../utils/queries';
+import { useQuery, useMutation } from '@apollo/client';
 
 const Vote = () => {
-  const [matchup, setMatchup] = useState({});
   let { id } = useParams();
+  
+  const { loading, data } = useQuery(QUERY_MATCHES, {
+      variables: { _id: id },
+    });
 
-  useEffect(() => {
-    const getMatchupInfo = async () => {
-      try {
-        const res = await getMatchup(id);
-        if (!res.ok) {
-          throw new Error('No matchup');
-        }
-        const matchup = await res.json();
-        setMatchup(matchup);
-      } catch (err) {
-        console.error(err);
-      }
-    };
-    getMatchupInfo();
-  }, [id]);
+
+  const matchup = data?.matches || [];
+  
+  const [createVote, { error } ] = useMutation(UPDATE_MATCH);
+
+  // const [matchup, setMatchup] = useState({});
+
+  // useEffect(() => {
+  //   const getMatchupInfo = async () => {
+  //     try {
+  //       const res = await getMatchup(id);
+  //       if (!res.ok) {
+  //         throw new Error('No matchup');
+  //       }
+  //       const matchup = await res.json();
+  //       setMatchup(matchup);
+  //     } catch (err) {
+  //       console.error(err);
+  //     }
+  //   };
+  //   getMatchupInfo();
+  // }, [id]);
 
   const handleVote = async (techNum) => {
     try {
-      const res = await createVote({ id, techNum });
+      await createVote({
+        variables: { id: id, whichTech: techNum },
+      });
+      // const res = await createVote({ id, techNum });
 
-      if (!res.ok) {
-        throw new Error('Could not vote');
-      }
+      // if (!res.ok) {
+      //   throw new Error('Could not vote');
+      // }
 
-      const matchup = await res.json();
-      console.log(matchup);
-      setMatchup(matchup);
+      // const matchup = await res.json();
+      // console.log(matchup);
+      // setMatchup(matchup);
     } catch (err) {
       console.error(err);
     }
